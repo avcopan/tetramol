@@ -5,7 +5,13 @@ readme = "README.md"  # the PyPI page
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{name = "Andreas V. Copan", email = "avcopan@uga.edu"}]
-dependencies = []
+dependencies = [
+    "automol>=0.0.27",
+    "numpy>=2",
+    "py3dmol>=2.5",
+    "scipy>=1.13",
+    "xyzrender>=0.3.8",
+]
 requires-python = ">= 3.13"
 
 [project.urls]
@@ -32,6 +38,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**.py" = ["S101", "PLR2004"]  # assert, magic values
+# Drawing scripts: not a package, and `orient` is imported for interactive use
+"drawings/**.py" = ["INP001", "F401"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -54,8 +62,9 @@ root_package = "tetramol"
 name = "Module Layering"
 type = "layers"
 layers = [
-    "tetramol.layer2",
-    "tetramol.layer1",
+    "tetramol.draw",
+    "tetramol.build",
+    "tetramol.grid",
 ]
 
 # Pytest configurations

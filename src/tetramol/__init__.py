@@ -1,8 +1,22 @@
-"""tetramol."""
+"""tetramol: idealized molecules on a tetrahedral grid, for illustrations."""
 
 __version__ = "0.0.0"
 
-from .layer1 import greet
-from .layer2 import greet_jim
+from . import draw, grid
+from .build import VALENCES, Builder
+from .draw import STYLE, orient, render
+from .grid import TETRAHEDRAL_ANGLE, XH_LENGTH, XY_LENGTH, tetrahedral_basis
 
-__all__ = ["greet", "greet_jim"]
+__all__ = [
+    "STYLE",
+    "TETRAHEDRAL_ANGLE",
+    "VALENCES",
+    "XH_LENGTH",
+    "XY_LENGTH",
+    "Builder",
+    "draw",
+    "grid",
+    "orient",
+    "render",
+    "tetrahedral_basis",
+]

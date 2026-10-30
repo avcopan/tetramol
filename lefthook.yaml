@@ -32,9 +32,6 @@ pre-commit:
     6-test:
       run: pixi run -e test test
 
-    7-test-lowest:
-      run: pixi run -e test-lowest test
-
     8-workflows:
       run: pixi run -e dev workflows
       tags: [check]

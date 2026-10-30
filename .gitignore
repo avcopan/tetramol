@@ -17,6 +17,9 @@ htmlcov/
 dist/
 *.conda
 
+# uv lock file, written by `pixi run add` (pixi.lock is the lock file)
+uv.lock
+
 # pixi environments
 .pixi/*
 !.pixi/config.toml

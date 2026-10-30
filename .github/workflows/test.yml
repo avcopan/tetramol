@@ -27,9 +27,9 @@ jobs:
     strategy:
       fail-fast: false  # report results for every environment
       matrix:
-        # test: highest compatible dependency versions
-        # test-lowest: lowest versions allowed by the lower bounds
-        environment: [test, test-lowest]
+        # test: highest compatible dependency versions (test-lowest is dropped, since
+        # xyzrender's unbounded transitive PyPI dependencies don't solve to lowest)
+        environment: [test]
 
     steps:
       - uses: actions/checkout@v6
