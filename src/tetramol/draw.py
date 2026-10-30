@@ -6,7 +6,6 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-import numpy as np
 import py3Dmol
 import xyzrender
 from automol import Geometry, geom
@@ -45,38 +44,36 @@ def render(
     return geom.render_svg(geo, out=out, config=config)
 
 
-def orient(geo: Geometry, *, viewer: str = "py3dmol", port: int = 0) -> Rotation:
-    """Rotate a geometry by hand and get the rotation.
+def orient(geo: Geometry, *, port: int = 0) -> Rotation:
+    """Rotate a geometry by hand in the browser and get the rotation.
 
-    With the default viewer, this opens py3Dmol in a web browser. Rotate the
-    molecule with the mouse, then click "Done". The view matches `render`:
-    both look down the z axis with x to the right and y up.
+    This opens the geometry in py3Dmol in a web browser. Rotate the molecule
+    with the mouse, then click "Done". The view matches `render`: both look
+    down the z axis with x to the right and y up.
 
     The rotation is also printed as code, to paste into a drawing script so that
     it reproduces the orientation without the viewer.
 
     Args:
         geo: Geometry.
-        viewer: ``"py3dmol"`` (in a browser) or ``"vmol"`` (via xyzrender,
-            which requires the `vmol` package; press ``z`` to confirm, then
-            ``q`` to quit).
-        port: Port for the local server behind the browser viewer. The default
-            (0) picks a free port.
+        port: Port for the local server behind the page. The default (0) picks a
+            free port.
 
     Returns:
         The rotation, to apply with ``automol.geom.rotate(geo, rot)``.
-
-    Raises:
-        ValueError: If `viewer` is unknown.
     """
-    if viewer == "py3dmol":
-        rot = _orient_py3dmol(geo, port=port)
-    elif viewer == "vmol":
-        rot = _orient_vmol(geo)
-    else:
-        msg = f"Unknown viewer {viewer!r}; use 'py3dmol' or 'vmol'."
-        raise ValueError(msg)
+    server, result = serve_orient_page(geo, port=port)
+    url = f"http://localhost:{server.server_address[1]}"
+    print(f"Orient the molecule at {url}, then click Done.")  # noqa: T201
+    webbrowser.open(url)
+    try:
+        while not result:
+            threading.Event().wait(0.2)
+    finally:
+        server.shutdown()
+        server.server_close()
 
+    rot = Rotation.from_quat(result[0])
     quat = ", ".join(f"{x:.6f}" for x in rot.as_quat())
     print(f"rot = Rotation.from_quat([{quat}])")  # noqa: T201
     return rot
@@ -168,29 +165,3 @@ def serve_orient_page(
     server = ThreadingHTTPServer(("localhost", port), Handler)
     threading.Thread(target=server.serve_forever, daemon=True).start()
     return server, result
-
-
-def _orient_py3dmol(geo: Geometry, *, port: int) -> Rotation:
-    """Orient a geometry in py3Dmol, in a web browser."""
-    server, result = serve_orient_page(geo, port=port)
-    url = f"http://localhost:{server.server_address[1]}"
-    print(f"Orient the molecule at {url}, then click Done.")  # noqa: T201
-    webbrowser.open(url)
-    try:
-        while not result:
-            threading.Event().wait(0.2)
-    finally:
-        server.shutdown()
-        server.server_close()
-    return Rotation.from_quat(result[0])
-
-
-def _orient_vmol(geo: Geometry) -> Rotation:
-    """Orient a geometry in vmol, via xyzrender."""
-    mol = geom._xyzrender_molecule(geo)  # noqa: SLF001
-    xyzrender.orient(mol)
-    coords = np.array([mol.graph.nodes[i]["position"] for i in mol.graph.nodes()])
-    oriented = Geometry(
-        symbols=geo.symbols, coordinates=coords, charge=geo.charge, spin=geo.spin
-    )
-    return geom.alignment_rotation(oriented, geo)

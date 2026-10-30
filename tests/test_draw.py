@@ -66,9 +66,3 @@ def test__orient_round_trip(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(webbrowser, "open", browser)
     found = orient(_methylamine().geometry())
     assert found.approx_equal(rot)
-
-
-def test__orient_unknown_viewer_raises() -> None:
-    """Test that an unknown viewer is rejected."""
-    with pytest.raises(ValueError, match="Unknown viewer"):
-        orient(_methylamine().geometry(), viewer="pymol")

@@ -29,6 +29,7 @@ To develop against a local automol checkout next to this repository, toggle it w
 ## Usage
 
 ```python
+from automol import geom
 from tetramol import Builder, orient, render
 
 b = Builder(up=(0, 1, 0), left=(-1, 0, 0))  # y is up the page, z toward you
@@ -38,7 +39,8 @@ b.add("C", c, toward=(-1, 0, 0))  # ... or through a slot by index: b.add("C", c
 b.add_hydrogens(avoid=(0, 0, -1))  # fill valences; N's lone pair points back
 geo = b.geometry()  # an automol Geometry
 
-rot = orient(geo)  # optional: rotate by hand in the browser
+rot = orient(geo)  # optional: rotate by hand in the browser,
+geo = geom.rotate(geo, rot)  # ... and apply the rotation
 render(geo, "drawing.svg")
 ```
 
