@@ -93,7 +93,7 @@ docs-preview = { cmd = "great-docs preview", depends-on = ["docs-build"] }
 # The publish tasks skip files that were already uploaded, so a failed release can be rerun
 # Build and publish conda package
 build-conda = "pixi publish --target-dir dist"
-publish-conda = "pixi upload prefix --skip-existing --channel automech dist/*.conda"
+publish-conda = "pixi upload prefix --skip-existing --channel avcopan/automech dist/*.conda"
 # Build and publish PyPI package
 build-pypi = "uv build"
 publish-pypi = "uv publish --check-url https://pypi.org/simple/"

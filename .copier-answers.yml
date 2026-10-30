@@ -5,5 +5,5 @@ author_email: avcopan@uga.edu
 author_name: Andreas V. Copan
 github_org_name: avcopan
 package_name: tetramol
-prefix_channel: automech
+prefix_channel: avcopan/automech
 repo_name: tetramol
