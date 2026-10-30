@@ -14,7 +14,7 @@ xyzrender = ">=0.3.8"
 
 [package]
 name = "tetramol"
-version = "0.0.0"
+version = "0.0.1"
 
 [package.build]
 backend = { name = "pixi-build-python", version = "*" }

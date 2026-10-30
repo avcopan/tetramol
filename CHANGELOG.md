@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
+
+## [0.0.1] - 2026-10-30
 ### Added
 - `Builder`, which places atoms on a tetrahedral "diamond" grid with ideal bond lengths (1.1 Å to H, 1.5 Å otherwise) and angles, choosing bond slots by index or by direction (`toward`), and filling valences with `add_hydrogens`.
 - `Builder.umbrella_image`, which adds the mirror image of a branch (e.g. the H's of an amine) to draw an umbrella inversion.

@@ -1,6 +1,6 @@
 """tetramol: idealized molecules on a tetrahedral grid, for illustrations."""
 
-__version__ = "0.0.0"
+__version__ = "0.0.1"
 
 from . import draw, grid
 from .build import VALENCES, Builder
