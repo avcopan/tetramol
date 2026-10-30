@@ -6,7 +6,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 authors = [{name = "Andreas V. Copan", email = "avcopan@uga.edu"}]
 dependencies = [
-    "automol>=0.0.27",
+    "automol>=0.0.28",
     "numpy>=2",
     "py3dmol>=2.5",
     "scipy>=1.13",
