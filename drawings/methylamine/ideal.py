@@ -9,6 +9,7 @@ from scipy.spatial.transform import Rotation
 from tetramol import Builder, orient, render
 
 NAME = "methylamine"
+METHOD = "ideal"
 # `__file__` is undefined when running cells in a REPL started at the repo root
 HERE = Path(globals().get("__file__", f"drawings/{NAME}/_")).parent
 
@@ -25,5 +26,5 @@ rot = Rotation.identity()
 geo = geom.rotate(geo, rot)
 
 # %% Write
-geo.xyz_file(path=HERE / f"{NAME}.xyz")
-render(geo, HERE / f"{NAME}.svg")
+geo.xyz_file(path=HERE / f"{METHOD}.xyz")
+render(geo, HERE / f"{METHOD}.svg")

@@ -9,12 +9,13 @@ from scipy.spatial.transform import Rotation
 from tetramol import crest, orient, render, render_spins
 
 NAME = "4-methylbicyclo[2.2.2]octan-1-amine"
+METHOD = "crest"
 SMILES = "CC12CCC(N)(CC1)CC2"
 # `__file__` is undefined when running cells in a REPL started at the repo root
 HERE = Path(globals().get("__file__", f"drawings/{NAME}/_")).parent
 
 # %% Conformers: the first run runs CREST; delete the -conformers.xyz file to rerun it
-path = HERE / f"{NAME}-conformers.xyz"
+path = HERE / f"{METHOD}-conformers.xyz"
 geos = crest.conformers(SMILES, path)
 energies = crest.energies(path)
 for i, energy in enumerate(energies):
@@ -32,5 +33,5 @@ rot = Rotation.from_euler("y", 60.0, degrees=True)
 geo = geom.rotate(geo, rot)
 
 # %% Write
-geo.xyz_file(path=HERE / f"{NAME}.xyz")
-render(geo, HERE / f"{NAME}.svg")
+geo.xyz_file(path=HERE / f"{METHOD}.xyz")
+render(geo, HERE / f"{METHOD}.svg")
