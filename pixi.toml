@@ -35,6 +35,8 @@ xyzrender = false  # PyPI only
 default = { solve-group = "default" }
 test = { features = ["test"], solve-group = "default"}
 dev = { features = ["dev", "test"], solve-group = "default"}
+# CREST on its own (see tetramol.crest), since it needs an older libgfortran than SciPy
+crest = { features = ["crest"], no-default-feature = true }
 
 [feature.test.dependencies]
 pytest = ">=9.1.1"
@@ -42,6 +44,12 @@ pytest-cov = ">=7.1.0"
 
 [feature.test.tasks]
 test = { cmd = "pytest", default-environment = "test" }
+
+[feature.crest.dependencies]
+crest = ">=3.0.2,<4"
+# CREST 3.0.2's optimizer exits silently (code 2) after its first cycle with
+# libgfortran 15+, while SciPy for Python 3.15 needs libgfortran5 >=15.3
+libgfortran5 = "<15"
 
 [feature.dev.dependencies]
 # Dependency management

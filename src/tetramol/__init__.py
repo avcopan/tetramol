@@ -2,7 +2,7 @@
 
 __version__ = "0.0.1"
 
-from . import draw, grid
+from . import crest, draw, grid
 from .build import VALENCES, Builder
 from .draw import STYLE, orient, render
 from .grid import TETRAHEDRAL_ANGLE, XH_LENGTH, XY_LENGTH, tetrahedral_basis
@@ -14,6 +14,7 @@ __all__ = [
     "XH_LENGTH",
     "XY_LENGTH",
     "Builder",
+    "crest",
     "draw",
     "grid",
     "orient",

@@ -7,6 +7,31 @@ platforms:
   - __glibc=2.28
   - __archspec=0=x86_64
 environments:
+  crest:
+    channels:
+    - url: https://conda.anaconda.org/conda-forge/
+    - url: https://conda.anaconda.org/avcopan/
+    packages:
+      linux-64:
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/cpcm-x-1.1.0-gfortran_ha02e54d_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/crest-3.0.2-h8876d29_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/dftd4-4.2.0-gfortran_ha02e54d_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/jonquil-0.3.2-gfortran_h956d735_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libblas-3.11.0-11_h4a7cf45_openblas.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libgcc-16.2.0-ha9f2e26_7.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran-14.4.0-h69a702a_7.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran5-14.4.0-hefb53d1_7.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libgomp-16.2.0-he0feb66_7.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/liblapack-3.11.0-11_h47877c9_openblas.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libopenblas-0.3.34-pthreads_h94d23a6_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/mctc-lib-0.5.2-gfortran_h956d735_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/multicharge-0.5.0-gfortran_ha02e54d_2.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/numsa-0.2.0-gfortran_h956d735_2.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/simple-dftd3-1.4.0-gfortran_h956d735_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tblite-0.6.0-gfortran_ha02e54d_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/toml-f-0.5.2-gfortran_h956d735_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/xtb-6.7.1-gfortran_ha02e54d_5.conda
   default:
     channels:
     - url: https://conda.anaconda.org/conda-forge/
@@ -888,6 +913,44 @@ packages:
   run_exports: {}
   size: 449527
   timestamp: 1793049301371
+- conda: https://conda.anaconda.org/conda-forge/linux-64/cpcm-x-1.1.0-gfortran_ha02e54d_1.conda
+  sha256: ec638ee159f4d29e7e2f68c605dc762599f178b1a1ccb2513165eed3aa225f56
+  md5: f9d5407308412e0675b975b3be084422
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - libblas >=3.9.0,<4.0a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - mctc-lib >=0.5.1,<0.6.0a0 gfortran_*
+  - numsa >=0.2.0,<0.3.0a0 gfortran_*
+  - toml-f >=0.5.0,<0.6.0a0 gfortran_*
+  license: LGPL-3.0-or-later
+  license_family: LGPL
+  run_exports:
+    weak:
+    - cpcm-x >=1.1.0,<1.2.0a0
+  size: 3068921
+  timestamp: 1781022398022
+- conda: https://conda.anaconda.org/conda-forge/linux-64/crest-3.0.2-h8876d29_1.conda
+  sha256: a316306ae0c900ebf6870b185fbe6a36a054b9b1f3963a16210cf1cb2d0ceb6f
+  md5: 18858ac36b3ced56e7b3b32a4b200fc4
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - libblas >=3.9.0,<4.0a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - xtb
+  license: LGPL-3.0-or-later
+  license_family: GPL
+  run_exports: {}
+  size: 31295513
+  timestamp: 1754411554164
 - conda: https://conda.anaconda.org/conda-forge/linux-64/cyrus-sasl-2.1.28-hac629b4_1.conda
   sha256: 7684da83306bb69686c0506fb09aa7074e1a55ade50c3a879e4e5df6eebb1009
   md5: af491aae930edc096b58466c51c4126c
@@ -960,6 +1023,26 @@ packages:
   run_exports: {}
   size: 399275
   timestamp: 1788443634354
+- conda: https://conda.anaconda.org/conda-forge/linux-64/dftd4-4.2.0-gfortran_ha02e54d_1.conda
+  sha256: 7b0b80990e179206beb5fab16ddc5f36327a5d0d1875ad152e6e65ed2bd277cc
+  md5: b18af80241c6ead52cfd2b3208ffc188
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - libblas >=3.9.0,<4.0a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - mctc-lib >=0.5.2,<0.6.0a0 gfortran_*
+  - multicharge >=0.5.0,<0.6.0a0 gfortran_*
+  license: LGPL-3.0-or-later
+  license_family: LGPL
+  run_exports:
+    weak:
+    - dftd4 >=4.2.0,<4.3.0a0
+  size: 845982
+  timestamp: 1784052604081
 - conda: https://conda.anaconda.org/conda-forge/linux-64/eigen-abi-5.0.1.80-hf414acd_3.conda
   sha256: 2c0ae975516a66f50a525666dd128dd82e27aec6370d1a846b1390f3fbc03a98
   md5: 56a1cca9a4a7bed2999630e5644c8d0e
@@ -1126,6 +1209,21 @@ packages:
     - icu >=78.3,<79.0a0
   size: 14459115
   timestamp: 1786545741408
+- conda: https://conda.anaconda.org/conda-forge/linux-64/jonquil-0.3.2-gfortran_h956d735_0.conda
+  sha256: aeed4b6fe715a6cac77f3181554386f7bfb4e3264182c11a9cd7d017b605482b
+  md5: 1fabe35a1947d6d27d774ac67e9de881
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - toml-f >=0.5.1,<0.6.0a0 gfortran_*
+  license: Apache-2.0 OR MIT
+  run_exports:
+    weak:
+    - jonquil >=0.3.2,<0.4.0a0
+  size: 116079
+  timestamp: 1782315837689
 - conda: https://conda.anaconda.org/conda-forge/linux-64/keyutils-1.6.3-h7cc23a3_1.conda
   sha256: dd053c96dcb0dcfd59422aefea9d2fe937a190167f34fba7893ec1e10a7e8963
   md5: ba55d1b89fd7775e67de8291029b4059
@@ -1479,6 +1577,18 @@ packages:
     - libgcc
   size: 28616
   timestamp: 1790303114248
+- conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran-14.4.0-h69a702a_7.conda
+  sha256: f446a624cd791a2ece425e085263f7ae404797f16bcda5f1acd8435564a22376
+  md5: cc76fc1e441a042ed99580fe8eb381a1
+  depends:
+  - libgfortran5 14.4.0 hefb53d1_7
+  constrains:
+  - libgfortran-ng ==14.4.0=*_7
+  license: GPL-3.0-only WITH GCC-exception-3.1
+  license_family: GPL
+  run_exports: {}
+  size: 28538
+  timestamp: 1790302898362
 - conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran-16.2.0-h69a702a_7.conda
   sha256: 9682ae4dd11487e10b904b3cb3ab6379cad25233d45fdfdf90d54349df244494
   md5: 3a8d285f5f22138ef826ad54cf267e73
@@ -1492,6 +1602,19 @@ packages:
   run_exports: {}
   size: 28571
   timestamp: 1790303139904
+- conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran5-14.4.0-hefb53d1_7.conda
+  sha256: 659db8c8f7de1145a11b827efd997c2fbd975882152940368206bd861b12526d
+  md5: 3dca857e94619104c7821ec55645c60b
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14.4.0
+  constrains:
+  - libgfortran 14.4.0
+  license: GPL-3.0-only WITH GCC-exception-3.1
+  license_family: GPL
+  run_exports: {}
+  size: 2375978
+  timestamp: 1790302880815
 - conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran5-16.2.0-h6b99dfc_7.conda
   sha256: 04dbab12c925b92977bb835dd2f5eda413607afa79f95a554e5a04b07a380322
   md5: 7719ed7be38ad8c492c4bd5cc2bce0c4
@@ -1645,6 +1768,23 @@ packages:
     - libntlm >=1.8,<2.0a0
   size: 33418
   timestamp: 1734670021371
+- conda: https://conda.anaconda.org/conda-forge/linux-64/libopenblas-0.3.34-pthreads_h94d23a6_0.conda
+  sha256: 23392fc4f4e5ba230fcd1ef825878ba5ca7ee4f6259fac0cbb13299134b7bf7a
+  md5: c282d68f272927612462b5d626838ef1
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  constrains:
+  - openblas >=0.3.34,<0.3.35.0a0
+  license: BSD-3-Clause
+  license_family: BSD
+  run_exports:
+    weak:
+    - libopenblas >=0.3.34,<1.0a0
+  size: 5952629
+  timestamp: 1784287497473
 - conda: https://conda.anaconda.org/conda-forge/linux-64/libopenblas-0.3.34-pthreads_hf13c14d_2.conda
   sha256: 69a722751e14eab2eb3bfdcb9acb1187afbd962b0c49b48d829341e0f6787f60
   md5: 7e19fcd73d7f0997d3cb3326d2586a86
@@ -1964,6 +2104,43 @@ packages:
   run_exports: {}
   size: 9120382
   timestamp: 1789824131029
+- conda: https://conda.anaconda.org/conda-forge/linux-64/mctc-lib-0.5.2-gfortran_h956d735_0.conda
+  sha256: 829a35807f672a69fd6f5d1bb2f6a5a47cb681d6d9eb3a43d2021fe6abb6c683
+  md5: fedeece5fe9ec527bb72b909b88505cc
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - jonquil >=0.3.0,<0.4.0a0 gfortran_*
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - toml-f >=0.5.0,<0.6.0a0 gfortran_*
+  license: Apache-2.0
+  license_family: APACHE
+  run_exports:
+    weak:
+    - mctc-lib >=0.5.2,<0.6.0a0
+  size: 707711
+  timestamp: 1781337218587
+- conda: https://conda.anaconda.org/conda-forge/linux-64/multicharge-0.5.0-gfortran_ha02e54d_2.conda
+  sha256: 87ee0395f9bc1f60fb752b246fe707939d2d94d0daa25477b71796d55a704965
+  md5: 698c070339741f52825314dd2e377354
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - libblas >=3.9.0,<4.0a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - mctc-lib >=0.5.2,<0.6.0a0 gfortran_*
+  license: Apache-2.0
+  license_family: APACHE
+  run_exports:
+    weak:
+    - multicharge >=0.5.0,<0.6.0a0
+  size: 518792
+  timestamp: 1784030055797
 - conda: https://conda.anaconda.org/conda-forge/linux-64/ncurses-6.6-hdb14827_1.conda
   sha256: 5d46557214ed184381dafe835b7c94a474a1c3b307a08a250b1ea4779b44ffb3
   md5: ee6c0cd80a60961a1f48aa3e0b91f986
@@ -2000,6 +2177,23 @@ packages:
     - numpy >=1.25,<3
   size: 9402941
   timestamp: 1791675319144
+- conda: https://conda.anaconda.org/conda-forge/linux-64/numsa-0.2.0-gfortran_h956d735_2.conda
+  sha256: 9ae2d957f45ce17c3545324e48f8739225fe994b5c8fe8f5e997b6994cfcd96e
+  md5: 748fc2ca87a06e5dbe45654794297fae
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - mctc-lib >=0.5.1,<0.6.0a0 gfortran_*
+  license: LGPL-3.0-or-later
+  license_family: LGPL
+  run_exports:
+    weak:
+    - numsa >=0.2.0,<0.3.0a0
+  size: 190656
+  timestamp: 1775033134423
 - conda: https://conda.anaconda.org/conda-forge/linux-64/openjpeg-2.5.4-heb1ab33_2.conda
   sha256: 131688a88bea8da92fe418c4558c5073435e2848911bc4c836c3a9dd5994b4aa
   md5: a3f3ac7a68d01c198e276dbb99e62032
@@ -2425,6 +2619,24 @@ packages:
   run_exports: {}
   size: 17464097
   timestamp: 1792930475373
+- conda: https://conda.anaconda.org/conda-forge/linux-64/simple-dftd3-1.4.0-gfortran_h956d735_1.conda
+  sha256: 4bf4d4f870bfbbe2511c8711ad3023a88052223a570bb6e5e868c021df440498
+  md5: bb26329429851177d4743f3dcf76d545
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - mctc-lib >=0.5.2,<0.6.0a0 gfortran_*
+  - toml-f >=0.5.2,<0.6.0a0 gfortran_*
+  license: LGPL-3.0-or-later
+  license_family: LGPL
+  run_exports:
+    weak:
+    - simple-dftd3 >=1.4.0,<1.5.0a0
+  size: 1077012
+  timestamp: 1784011423332
 - conda: https://conda.anaconda.org/conda-forge/linux-64/sqlalchemy-2.1.6-py315h55299fc_0.conda
   sha256: 7aa9172d4b614fd8ac8bcd39b413ba1e5c6c7e7032d4598e4311b356a276b160
   md5: 8c09a44a5885209739f545ce543f6a91
@@ -2441,6 +2653,28 @@ packages:
   run_exports: {}
   size: 4516983
   timestamp: 1792620157502
+- conda: https://conda.anaconda.org/conda-forge/linux-64/tblite-0.6.0-gfortran_ha02e54d_0.conda
+  sha256: b490ca0bf96bb9534063d1b3c4544178c255abe409bdf58425ab1a16ef35ebe3
+  md5: 8c6cf9a32938f7cd7550fd6c2f61d3ea
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - dftd4 >=4.2.0,<4.3.0a0 gfortran_*
+  - libblas >=3.9.0,<4.0a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - mctc-lib >=0.5.1,<0.6.0a0 gfortran_*
+  - simple-dftd3 >=1.4.0,<1.5.0a0 gfortran_*
+  - toml-f >=0.5.0,<0.6.0a0 gfortran_*
+  license: LGPL-3.0-or-later
+  license_family: LGPL
+  run_exports:
+    weak:
+    - tblite >=0.6.0,<0.7.0a0
+  size: 6269298
+  timestamp: 1778932035736
 - conda: https://conda.anaconda.org/conda-forge/linux-64/tk-8.6.13-noxft_h1df4ec4_4.conda
   build_number: 104
   sha256: a1a241d172c1ccab067ba245206dd048bc3c2d1b84504b53c9468e99adfc16a1
@@ -2458,6 +2692,20 @@ packages:
     - tk >=8.6.13,<8.7.0a0
   size: 3566806
   timestamp: 1787272857910
+- conda: https://conda.anaconda.org/conda-forge/linux-64/toml-f-0.5.2-gfortran_h956d735_0.conda
+  sha256: 3ac706421c1bee724dfb83652bdc1160e624e44e23d7706e5eeaeff0da58e9f7
+  md5: 0e7c1fba9c117ff1b71eff6418cbfb18
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  license: Apache-2.0 OR MIT
+  run_exports:
+    weak:
+    - toml-f >=0.5.2,<0.6.0a0
+  size: 461369
+  timestamp: 1782552012842
 - conda: https://conda.anaconda.org/conda-forge/linux-64/tornado-6.5.10-py315hb246bd9_0.conda
   sha256: 172e96c9f1a61e0088424e15bdad88da5f764ef1b51cf9e436e5d7d6416d41be
   md5: 6e4503c613e1b0d2ba8d5736ec0ecbb0
@@ -2735,6 +2983,29 @@ packages:
     - xorg-libxrender >=0.9.13,<0.10.0a0
   size: 34604
   timestamp: 1792530399214
+- conda: https://conda.anaconda.org/conda-forge/linux-64/xtb-6.7.1-gfortran_ha02e54d_5.conda
+  sha256: 9fe81c43fbe3909e239841d8fe27a7d719f4e6441cc5a1eade784f12b7459edf
+  md5: 7cc533881351ee39f1442a4af84ad5f3
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - _openmp_mutex >=4.5
+  - cpcm-x >=1.1.0,<1.2.0a0 gfortran_*
+  - dftd4 >=4.2.0,<4.3.0a0 gfortran_*
+  - libblas >=3.9.0,<4.0a0
+  - libgcc >=14
+  - libgfortran
+  - libgfortran5 >=14.3.0
+  - liblapack >=3.9.0,<4.0a0
+  - mctc-lib >=0.5.1,<0.6.0a0 gfortran_*
+  - multicharge >=0.5.0,<0.6.0a0 gfortran_*
+  - tblite >=0.6.0,<0.7.0a0 gfortran_*
+  license: LGPL-3.0-or-later
+  license_family: LGPL
+  run_exports:
+    weak:
+    - xtb >=6.7.1,<6.8.0a0
+  size: 2425762
+  timestamp: 1781082277623
 - conda: https://conda.anaconda.org/conda-forge/linux-64/yaml-0.2.5-hebe6cf0_3.conda
   sha256: d164dfa75ecd538f6fd68765defcc06aa875bc697b9b215362d79a2a73125dd0
   md5: e741576fb8f89821ac7c1c537322a33d
