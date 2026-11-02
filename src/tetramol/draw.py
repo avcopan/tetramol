@@ -150,7 +150,51 @@ def orient(geo: Geometry, *, axis: ArrayLike | None = None, port: int = 0) -> Ro
     Returns:
         The rotation, to apply with ``automol.geom.rotate(geo, rot)``.
     """
-    server, result = serve_orient_page(geo, axis=axis, port=port)
+    _, rot = _orient([geo], labels=None, axis=axis, port=port)
+    return rot
+
+
+def orient_multi(
+    geos: Sequence[Geometry],
+    *,
+    labels: Sequence[str] | None = None,
+    axis: ArrayLike | None = None,
+    port: int = 0,
+) -> tuple[int, Rotation]:
+    """Choose one of several geometries and rotate it by hand in the browser.
+
+    Like `orient`, with a slider (or the arrow keys) to switch between the
+    geometries, e.g. CREST conformers. The view is shared, so switching keeps
+    the current rotation. Click "Done" on the one you want.
+
+    The choice and the rotation are also printed as code, to paste into a
+    drawing script (``geo = geos[i]`` and ``rot = ...``).
+
+    Args:
+        geos: Geometries.
+        labels: Text to show for each geometry, e.g. its relative energy.
+            Defaults to none (just the index).
+        axis: Axis to spin about, if any (see `orient`). By default, rotate
+            freely.
+        port: Port for the local server behind the page. The default (0) picks a
+            free port.
+
+    Returns:
+        The index of the chosen geometry, and the rotation, to apply with
+        ``automol.geom.rotate(geos[index], rot)``.
+    """
+    return _orient(geos, labels=labels, axis=axis, port=port)
+
+
+def _orient(
+    geos: Sequence[Geometry],
+    *,
+    labels: Sequence[str] | None,
+    axis: ArrayLike | None,
+    port: int,
+) -> tuple[int, Rotation]:
+    """Serve the orientation page, wait for "Done", and print the result as code."""
+    server, result = serve_orient_page(geos, labels=labels, axis=axis, port=port)
     url = f"http://localhost:{server.server_address[1]}"
     print(f"Orient the molecule at {url}, then click Done.")  # noqa: T201
     webbrowser.open(url)
@@ -161,16 +205,19 @@ def orient(geo: Geometry, *, axis: ArrayLike | None = None, port: int = 0) -> Ro
         server.shutdown()
         server.server_close()
 
-    rot = Rotation.from_quat(result[0])
+    index = int(result[0]["index"])
+    rot = Rotation.from_quat(result[0]["quat"])
+    if len(geos) > 1:
+        print(f"geo = geos[{index}]")  # noqa: T201
     if axis is None:
         quat = ", ".join(f"{x:.6f}" for x in rot.as_quat())
         print(f"rot = Rotation.from_quat([{quat}])")  # noqa: T201
-        return rot
+        return index, rot
 
     unit = _unit(axis)
     angle = float(np.degrees(np.dot(rot.as_rotvec(), unit))) % 360
     print(f"rot = {_spin_code(unit, angle)}")  # noqa: T201
-    return Rotation.from_rotvec(np.radians(angle) * unit)
+    return index, Rotation.from_rotvec(np.radians(angle) * unit)
 
 
 def _unit(axis: ArrayLike) -> np.ndarray:
@@ -214,9 +261,12 @@ $3Dmolpromise.then(function() {{
       quat().map((x) => x.toFixed(4)).join(", ");
   }};
   viewer.setViewChangeCallback(show);
+  let index = () => 0;
+  {pick_script}
   {spin_script}
   document.getElementById("done").onclick = () => {{
-    fetch("/done", {{method: "POST", body: JSON.stringify(quat())}}).then(() => {{
+    const body = JSON.stringify({{index: index(), quat: quat()}});
+    fetch("/done", {{method: "POST", body: body}}).then(() => {{
       document.body.innerHTML = "<p style='padding: 8px'>Done. Close this tab.</p>";
     }});
   }};
@@ -227,6 +277,36 @@ $3Dmolpromise.then(function() {{
 """
 
 _FREE_CONTROLS = "<span>Rotate with the mouse, then click Done.</span>"
+
+_PICK_CONTROLS = """<label>Geometry:
+  <input id="pick" type="range" min="0" max="{last}" step="1" value="0"
+         style="width: 240px;">
+  <code id="picked"></code></label>"""
+
+# Show only the picked model. The view is shared by all models, so switching
+# keeps the rotation. The arrow keys step through the models.
+_PICK_SCRIPT = """const labels = {labels_js};
+  const picker = document.getElementById("pick");
+  index = () => Number(picker.value);
+  const pick = () => {{
+    labels.forEach((_, i) => {{
+      const model = viewer.getModel(i);
+      if (i === index()) model.show(); else model.hide();
+    }});
+    viewer.render();
+    const label = labels[index()] ? ": " + labels[index()] : "";
+    document.getElementById("picked").textContent =
+      `${{index()}} / ${{labels.length - 1}}${{label}}`;
+  }};
+  picker.oninput = pick;
+  document.addEventListener("keydown", (event) => {{
+    if (document.activeElement === picker) return;
+    const step = {{ArrowRight: 1, ArrowLeft: -1}}[event.key];
+    if (!step) return;
+    picker.value = Math.min(Math.max(index() + step, 0), labels.length - 1);
+    pick();
+  }});
+  pick();"""
 
 _SPIN_CONTROLS = """<label>Spin about ({axis_text}):
   <input id="angle" type="range" min="0" max="360" step="1" value="0"
@@ -254,50 +334,83 @@ _SPIN_SCRIPT = """const axis = [{axis_js}];
   spin();"""
 
 
-def orient_page(geo: Geometry, *, axis: ArrayLike | None = None) -> str:
+def orient_page(
+    geos: Geometry | Sequence[Geometry],
+    *,
+    labels: Sequence[str] | None = None,
+    axis: ArrayLike | None = None,
+) -> str:
     """Make the web page for orienting a geometry in the browser.
 
     Args:
-        geo: Geometry.
+        geos: Geometry, or several to choose from with a slider.
+        labels: Text to show for each geometry (see `orient_multi`).
         axis: Axis to spin about with a slider, if any. By default, the page
             rotates freely with the mouse.
 
     Returns:
         HTML for a page with a py3Dmol viewer and a "Done" button, which posts
-        the view quaternion ``[qx, qy, qz, qw]`` as JSON to ``/done``.
+        ``{"index": i, "quat": [qx, qy, qz, qw]}`` as JSON to ``/done``: the
+        chosen geometry and the view quaternion.
+
+    Raises:
+        ValueError: If there are no geometries, or `labels` doesn't have one
+            entry per geometry.
     """
+    geos = [geos] if isinstance(geos, Geometry) else list(geos)
+    if not geos:
+        msg = "Expected at least one geometry."
+        raise ValueError(msg)
+    if labels is not None and len(labels) != len(geos):
+        msg = f"Got {len(labels)} labels for {len(geos)} geometries."
+        raise ValueError(msg)
+
     view = py3Dmol.view(width="100%", height="90vh")
-    geom.view(geo, view=view)
+    for geo in geos:
+        geom.view(geo, view=view)
+    controls = []
+    pick_script = spin_script = ""
+    if len(geos) > 1:
+        labels_js = json.dumps(list(labels or [""] * len(geos))).replace("</", "<\\/")
+        controls.append(_PICK_CONTROLS.format(last=len(geos) - 1))
+        pick_script = _PICK_SCRIPT.format(labels_js=labels_js)
     if axis is None:
-        controls, spin_script = _FREE_CONTROLS, ""
+        controls.append(_FREE_CONTROLS)
     else:
         unit = _unit(axis)
         text = ", ".join(f"{x:g}" for x in unit.round(3))
-        controls = _SPIN_CONTROLS.format(axis_text=text)
+        controls.append(_SPIN_CONTROLS.format(axis_text=text))
         spin_script = _SPIN_SCRIPT.format(axis_js=", ".join(map(repr, unit.tolist())))
     return _PAGE.format(
         viewer_html=view.write_html(),
         uniqueid=view.uniqueid,
-        controls=controls,
+        controls="\n  ".join(controls),
+        pick_script=pick_script,
         spin_script=spin_script,
     )
 
 
 def serve_orient_page(
-    geo: Geometry, *, axis: ArrayLike | None = None, port: int = 0
+    geos: Geometry | Sequence[Geometry],
+    *,
+    labels: Sequence[str] | None = None,
+    axis: ArrayLike | None = None,
+    port: int = 0,
 ) -> tuple[ThreadingHTTPServer, list]:
     """Serve the orientation page from a local server, in a background thread.
 
     Args:
-        geo: Geometry.
+        geos: Geometry, or several to choose from (see `orient_page`).
+        labels: Text to show for each geometry (see `orient_multi`).
         axis: Axis to spin about, if any (see `orient_page`).
         port: Port to serve on. The default (0) picks a free port.
 
     Returns:
-        The server, and a list that receives the view quaternion when the page
-        posts it. The server shuts itself down after that.
+        The server, and a list that receives the page's result,
+        ``{"index": i, "quat": [qx, qy, qz, qw]}``, when it posts it. The server
+        shuts itself down after that.
     """
-    page = orient_page(geo, axis=axis).encode()
+    page = orient_page(geos, labels=labels, axis=axis).encode()
     result: list = []
 
     class Handler(BaseHTTPRequestHandler):

@@ -34,6 +34,7 @@ drawings/
   See `4-methylbicyclo[2.2.2]octan-1-amine/crest.py`.
 - **CREST.** `crest.conformers(smiles, path)` runs a CREST conformer search the first time, in a temporary directory, and caches the conformers at `path` (lowest energy first).
   It takes minutes to tens of minutes.
+  To choose a conformer, run `orient_multi(geos, labels=...)`: like `orient`, with a slider (or the arrow keys) to switch between the geometries, and it prints `geo = geos[i]` along with the rotation.
   CREST runs in its own Pixi environment (`crest`), because it needs an older libgfortran than SciPy.
 - **Umbrella motions.** `b.umbrella_image(n)` adds the mirror image of the branch on atom `n` and keeps both sides; fade one in Inkscape.
   See `ethane-1,1,1-triamine/ideal.py`.

@@ -8,9 +8,10 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from automol import geom
 from scipy.spatial.transform import Rotation
 
-from tetramol import Builder, draw, orient, render, render_spins
+from tetramol import Builder, draw, orient, orient_multi, render, render_spins
 
 
 def _methylamine() -> Builder:
@@ -45,11 +46,13 @@ def test__serve_orient_page_round_trip() -> None:
         assert b"Done" in resp.read()
 
     quat = Rotation.random(random_state=0).as_quat().tolist()
-    req = urllib.request.Request(f"{url}/done", data=json.dumps(quat).encode())  # noqa: S310
+    data = json.dumps({"index": 0, "quat": quat}).encode()
+    req = urllib.request.Request(f"{url}/done", data=data)  # noqa: S310
     with urllib.request.urlopen(req):  # noqa: S310
         pass
     server.server_close()
-    assert np.allclose(result[0], quat)
+    assert result[0]["index"] == 0
+    assert np.allclose(result[0]["quat"], quat)
 
 
 def test__orient_round_trip(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -59,7 +62,7 @@ def test__orient_round_trip(monkeypatch: pytest.MonkeyPatch) -> None:
     def browser(url: str) -> None:
         with urllib.request.urlopen(url):  # noqa: S310
             pass
-        data = json.dumps(rot.as_quat().tolist()).encode()
+        data = json.dumps({"index": 0, "quat": rot.as_quat().tolist()}).encode()
         req = urllib.request.Request(f"{url}/done", data=data)  # noqa: S310
         threading.Thread(target=urllib.request.urlopen, args=(req,)).start()
 
@@ -92,7 +95,7 @@ def test__orient_spin_round_trip(
     """Test that `orient` with an axis returns the spin about that axis."""
 
     def browser(url: str) -> None:
-        data = json.dumps(posted.as_quat().tolist()).encode()
+        data = json.dumps({"index": 0, "quat": posted.as_quat().tolist()}).encode()
         req = urllib.request.Request(f"{url}/done", data=data)  # noqa: S310
         threading.Thread(target=urllib.request.urlopen, args=(req,)).start()
 
@@ -110,3 +113,55 @@ def test__render_spins(tmp_path: Path) -> None:
     assert svg.count("<svg") == len(angles) + 1
     for angle in angles:
         assert f">{angle}°</text>" in svg
+
+
+def _conformers() -> list:
+    """Three made-up conformers: methylamine spun about its C-N bond."""
+    geo = _methylamine().geometry()
+    return [
+        geom.rotate(geo, Rotation.from_euler("z", angle, degrees=True))
+        for angle in (0, 40, 80)
+    ]
+
+
+def test__orient_page_multi() -> None:
+    """Test that the page adds every geometry and a slider to choose one."""
+    geos = _conformers()
+    page = draw.orient_page(geos, labels=["+0.00", "+1.25", "+3.50"])
+    assert page.count("addModel(") == len(geos)
+    assert 'id="pick"' in page
+    assert 'max="2"' in page
+    assert '["+0.00", "+1.25", "+3.50"]' in page
+    assert 'id="pick"' not in draw.orient_page(geos[0])
+
+
+@pytest.mark.parametrize(
+    ("kwargs", "match"),
+    [({"geos": []}, "at least one"), ({"labels": ["a"]}, "1 labels for 3")],
+)
+def test__orient_page_multi_errors(kwargs: dict, match: str) -> None:
+    """Test that missing geometries and mismatched labels are rejected."""
+    kwargs = {"geos": _conformers(), **kwargs}
+    with pytest.raises(ValueError, match=match):
+        draw.orient_page(**kwargs)
+
+
+@pytest.mark.parametrize("axis", [None, (0, 0, 1)])
+def test__orient_multi_round_trip(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    axis: tuple[float, float, float] | None,
+) -> None:
+    """Test that `orient_multi` returns the chosen index and rotation."""
+    posted = Rotation.from_euler("z", 30, degrees=True)
+
+    def browser(url: str) -> None:
+        data = json.dumps({"index": 2, "quat": posted.as_quat().tolist()}).encode()
+        req = urllib.request.Request(f"{url}/done", data=data)  # noqa: S310
+        threading.Thread(target=urllib.request.urlopen, args=(req,)).start()
+
+    monkeypatch.setattr(webbrowser, "open", browser)
+    index, rot = orient_multi(_conformers(), axis=axis)
+    assert index == 2
+    assert rot.approx_equal(posted)
+    assert "geo = geos[2]" in capsys.readouterr().out
