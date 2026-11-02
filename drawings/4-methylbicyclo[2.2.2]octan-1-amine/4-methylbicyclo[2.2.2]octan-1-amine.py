@@ -6,7 +6,7 @@ from pathlib import Path
 from automol import geom
 from scipy.spatial.transform import Rotation
 
-from tetramol import crest, orient, render
+from tetramol import crest, orient, render, render_spins
 
 NAME = "4-methylbicyclo[2.2.2]octan-1-amine"
 SMILES = "CC12CCC(N)(CC1)CC2"
@@ -23,8 +23,12 @@ for i, energy in enumerate(energies):
 # %% Choose: look at others with `render(geos[i])` or `geom.view(geos[i])`
 geo = geos[0]
 
-# %% Orient: to change it, run `orient(geo)` and paste the printed rotation here
-rot = Rotation.from_quat([-0.612569, -0.622363, -0.362399, -0.325715])
+# %% Orient: methyl C and N on the y axis (N on top), then spin about y
+c, n = 0, 5
+geo = geom.translate(geo, -geo.coordinates[c])
+geo = geom.rotate(geo, geom.axis_alignment_rotation(geo, (c, n), axis=(0, 1, 0)))
+geo = geom.translate(geo, -(geo.coordinates[n] + geo.coordinates[c]) / 2)
+rot = Rotation.from_euler("y", 60.0, degrees=True)
 geo = geom.rotate(geo, rot)
 
 # %% Write
