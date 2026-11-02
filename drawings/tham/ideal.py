@@ -6,7 +6,7 @@ from pathlib import Path
 from automol import geom
 from scipy.spatial.transform import Rotation
 
-from tetramol import Builder, orient, render
+from tetramol import Builder, orient, render, umbrella_edge_on, umbrella_image
 
 NAME = "tham"
 METHOD = "ideal"
@@ -29,7 +29,12 @@ geo = b.geometry()
 # %% Orient: to change it, run `orient(geo)` and paste the printed rotation here
 rot = Rotation.from_euler("yx", [-65, 30], degrees=True)
 geo = geom.rotate(geo, rot)
+# Twist the NH2 about the C-N bond, so that its umbrella mirror plane is edge-on
+geo = umbrella_edge_on(geo, n)
 
-# %% Write
+# %% Write, then the umbrella variant: add the inverted NH2's H's (mirrored through
+# the edge-on plane), to fade afterwards
 geo.xyz_file(path=HERE / f"{METHOD}.xyz")
 render(geo, HERE / f"{METHOD}.svg")
+umbrella_geo, image = umbrella_image(geo, n)
+render(umbrella_geo, HERE / f"{METHOD}-umbrella.svg")
