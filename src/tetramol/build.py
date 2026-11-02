@@ -26,6 +26,7 @@ VALENCES = {
 """Default number of bonds to each element, used by `Builder.add_hydrogens`."""
 
 _CLASH_DISTANCE = 0.5
+_TIE = 1e-8  # `toward` scores closer than this are ties
 
 
 class Builder:
@@ -104,6 +105,50 @@ class Builder:
         """
         return [s for s in range(4) if s not in self.bonds[key]]
 
+    def tangent(
+        self, key: int, center: int, axis: ArrayLike | None = None
+    ) -> np.ndarray:
+        """Get the direction around an axis at an atom, e.g. for spiral arms.
+
+        This is the counterclockwise direction around `axis`, looking down from
+        its tip, through the point of atom `key`. The axis passes through atom
+        `center`. Passing it as `toward` for the same atom of each branch around
+        an axis builds the branches the same way, e.g. as a C3-symmetric
+        pinwheel. Negate it to turn the other way.
+
+        Args:
+            key: Atom index.
+            center: Atom on the axis.
+            axis: Direction of the axis. Defaults to the builder's `up`
+                (slot 0 of the first atom).
+
+        Returns:
+            The unit direction.
+
+        Raises:
+            ValueError: If atom `key` is on the axis.
+
+        Example:
+            Three CH2OH arms below a C-N bond, spiraling the same way:
+
+            >>> b = Builder(up=(0, 1, 0))
+            >>> c = b.add("C")
+            >>> n = b.add("N", c, 0)
+            >>> for slot in b.open_slots(c):
+            ...     ch2 = b.add("C", c, slot)
+            ...     o = b.add("O", ch2, toward=b.tangent(ch2, c))
+            ...     h = b.add("H", o, toward=b.tangent(o, c))
+            >>> len(b.add_hydrogens())  # NH2 and three CH2
+            8
+        """
+        axis = self.basis[0] if axis is None else np.asarray(axis, dtype=float)
+        vec = np.cross(axis, self.positions[key] - self.positions[center])
+        norm = np.linalg.norm(vec)
+        if np.isclose(norm, 0.0):
+            msg = f"Atom {key} is on the axis through atom {center}."
+            raise ValueError(msg)
+        return vec / norm
+
     def add(
         self,
         symbol: str,
@@ -122,7 +167,8 @@ class Builder:
             slot: Slot of `parent` to bond through. If neither this nor
                 `toward` is given, use the first empty slot.
             toward: Direction to bond in. The empty slot of `parent` closest
-                to this direction is used.
+                to this direction is used. It must be closer than the others:
+                ties raise, so that the choice never depends on slot order.
             length: Bond length. Defaults to `xh_length` for bonds to hydrogen
                 and `xy_length` otherwise.
 
@@ -130,7 +176,8 @@ class Builder:
             Index of the new atom.
 
         Raises:
-            ValueError: If the parent, slot, or position is invalid.
+            ValueError: If the parent, slot, or position is invalid, or if
+                `toward` is equally close to several empty slots.
         """
         symbol = element.symbol(symbol)
         if parent is None:
@@ -297,7 +344,17 @@ class Builder:
             raise ValueError(msg)
         if toward is not None:
             dirs = [self.slot_direction(parent, s) for s in open_slots]
-            return open_slots[int(np.argmax(np.dot(dirs, toward)))]
+            scores = np.dot(dirs, toward)
+            best = np.flatnonzero(np.isclose(scores, scores.max(), rtol=0, atol=_TIE))
+            if len(best) > 1:
+                tied = [open_slots[i] for i in best]
+                vec = np.asarray(toward, dtype=float).round(6).tolist()
+                msg = (
+                    f"Slots {tied} of atom {parent} are equally close to `toward` "
+                    f"{vec}; give a slot or a more specific direction."
+                )
+                raise ValueError(msg)
+            return open_slots[int(best[0])]
         if slot is None:
             return open_slots[0]
         if slot not in open_slots:

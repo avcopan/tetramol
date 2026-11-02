@@ -218,3 +218,84 @@ def test__umbrella_image_errors() -> None:
         b.umbrella_image(n)
     _, images = b.umbrella_image(n, [], normal=(1, 0, 0))
     assert images == []
+
+
+def _spiral_tham(turn: int = 1, **kwargs: object) -> tuple[Builder, int]:
+    """THAM with its CH2OH arms spiraling around the C-N bond."""
+    b = Builder(**kwargs)  # ty: ignore[invalid-argument-type]
+    c = b.add("C")
+    n = b.add("N", c, 0)
+    for slot in b.open_slots(c):
+        ch2 = b.add("C", c, slot)
+        o = b.add("O", ch2, toward=turn * b.tangent(ch2, c))
+        b.add("H", o, toward=turn * b.tangent(o, c))
+    b.add_hydrogens()
+    return b, n
+
+
+def _maps_onto(pos: np.ndarray, syms: list[str], new: np.ndarray) -> bool:
+    """Check that `new` positions are a permutation of `pos`, matching symbols."""
+    dists = np.linalg.norm(pos[:, None] - new[None], axis=-1)
+    match = dists.argmin(axis=0)
+    return (
+        bool(np.allclose(dists.min(axis=0), 0, atol=1e-8))
+        and sorted(match) == list(range(len(pos)))
+        and [syms[i] for i in match] == syms
+    )
+
+
+@pytest.mark.parametrize("seed", range(3))
+@pytest.mark.parametrize("turn", [1, -1])
+def test__tangent_spiral_is_c3_symmetric(seed: int, turn: int) -> None:
+    """Test that spiral arms map onto themselves under a 120-degree turn."""
+    up, left = Rotation.random(random_state=seed).apply([[0, 0, 1], [-1, 0, 0]])
+    b, n = _spiral_tham(turn, up=up, left=left)
+    keys = [k for k in range(b.atom_count) if k != n and b.parents[k] != n]
+    pos = np.array(b.positions)[keys]
+    syms = [b.symbols[k] for k in keys]
+    c3 = Rotation.from_rotvec(2 * np.pi / 3 * up)
+    assert _maps_onto(pos, syms, c3.apply(pos))
+    _assert_ideal(b)
+
+
+def test__tangent_spirals_are_mirror_images() -> None:
+    """Test that the two turning senses give different, mirror-image spirals."""
+    right, n = _spiral_tham(1)
+    left, _ = _spiral_tham(-1)
+    keys = [k for k in range(right.atom_count) if k != n and right.parents[k] != n]
+    pos_r, pos_l = np.array(right.positions)[keys], np.array(left.positions)[keys]
+    syms = [left.symbols[k] for k in keys]
+    assert not np.allclose(pos_r, pos_l)
+    # Reflecting through a plane that contains `up` and the first arm's C
+    normal = np.cross(right.basis[0], right.positions[2])
+    mirror = pos_r - 2 * np.outer(pos_r @ normal, normal) / (normal @ normal)
+    assert _maps_onto(pos_l, syms, mirror)
+
+
+@pytest.mark.parametrize("seed", range(3))
+def test__tangent(seed: int) -> None:
+    """Test that the tangent is a unit vector around the axis, following slot order."""
+    up, left = Rotation.random(random_state=seed).apply([[0, 0, 1], [-1, 0, 0]])
+    b = Builder(up=up, left=left)
+    c = b.add("C")
+    arms = [b.add("C", c, slot) for slot in (1, 2, 3)]
+    for k in arms:
+        t = b.tangent(k, c)
+        radial = b.positions[k] - b.positions[c]
+        assert np.isclose(np.linalg.norm(t), 1)
+        assert np.isclose(t @ b.basis[0], 0)
+        assert np.isclose(t @ radial, 0)
+    # Counterclockwise around `up`: slot 1's tangent leans toward slot 2
+    assert b.tangent(arms[0], c) @ b.basis[2] > b.tangent(arms[0], c) @ b.basis[3]
+    with pytest.raises(ValueError, match="on the axis"):
+        b.tangent(b.add("N", c, 0), c)
+
+
+def test__toward_tie_raises() -> None:
+    """Test that a direction equally close to two empty slots is rejected."""
+    b = Builder(up=(0, 1, 0))
+    c = b.add("C")
+    b.add("N", c, 0)
+    ch2 = b.add("C", c, 1)
+    with pytest.raises(ValueError, match="equally close"):
+        b.add("O", ch2, toward=(0, 1, 0))
