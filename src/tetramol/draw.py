@@ -22,11 +22,19 @@ STYLE = xyzrender.build_config(
     bond_width=25,
     bond_color="#000000",
     atom_stroke_width=3,
+    bond_outline_color="#ffffff",
+    bond_outline_width=2,
     hy=True,
     bo=False,
     fog=False,
 )
-"""House style: flat atoms with black bonds, drawn as oriented (no auto-rotation)."""
+"""House style: flat atoms with black bonds, drawn as oriented (no auto-rotation).
+
+Bonds have a thin white outline, so that where bonds cross, the front one cuts a
+gap through the one behind it. Fog is off, so that fading an atom (e.g. an
+umbrella image) can only mean one thing. To change a field for one drawing,
+use e.g. ``dataclasses.replace(STYLE, bond_outline_width=3)``.
+"""
 
 SPINS_COLUMNS = 4
 """Number of panels per row in `render_spins`."""

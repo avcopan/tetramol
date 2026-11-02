@@ -1,13 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 761 800" width="761" height="800">
   <rect width="100%" height="100%" fill="#ffffff"/>
+  <line x1="483.6" y1="655.8" x2="425.0" y2="614.3" stroke="#ffffff" stroke-width="55.8" stroke-linecap="round"/>
   <circle cx="507.0" cy="672.3" r="55.1" fill="#ffffff" stroke="black" stroke-width="5.8"/>
   <line x1="483.6" y1="655.8" x2="425.0" y2="614.3" stroke="#000000" stroke-width="48.1" stroke-linecap="round"/>
+  <line x1="380.5" y1="488.6" x2="380.5" y2="305.9" stroke="#ffffff" stroke-width="55.8" stroke-linecap="round"/>
+  <line x1="291.6" y1="614.3" x2="174.4" y2="655.8" stroke="#ffffff" stroke-width="55.8" stroke-linecap="round"/>
+  <line x1="425.0" y1="614.3" x2="483.6" y2="655.8" stroke="#ffffff" stroke-width="55.8" stroke-linecap="round"/>
   <circle cx="380.5" cy="582.9" r="104.8" fill="#aaaaaa" stroke="black" stroke-width="5.8"/>
   <line x1="380.5" y1="488.6" x2="380.5" y2="305.9" stroke="#000000" stroke-width="48.1" stroke-linecap="round"/>
   <line x1="291.6" y1="614.3" x2="174.4" y2="655.8" stroke="#000000" stroke-width="48.1" stroke-linecap="round"/>
   <line x1="425.0" y1="614.3" x2="483.6" y2="655.8" stroke="#000000" stroke-width="48.1" stroke-linecap="round"/>
+  <line x1="586.6" y1="144.2" x2="464.2" y2="187.5" stroke="#ffffff" stroke-width="55.8" stroke-linecap="round"/>
   <circle cx="633.4" cy="127.7" r="55.1" fill="#ffffff" stroke="black" stroke-width="5.8"/>
   <line x1="586.6" y1="144.2" x2="464.2" y2="187.5" stroke="#000000" stroke-width="48.1" stroke-linecap="round"/>
+  <line x1="338.6" y1="187.5" x2="277.4" y2="144.2" stroke="#ffffff" stroke-width="55.8" stroke-linecap="round"/>
   <circle cx="380.5" cy="217.1" r="98.7" fill="#3050f8" stroke="black" stroke-width="5.8"/>
   <line x1="338.6" y1="187.5" x2="277.4" y2="144.2" stroke="#000000" stroke-width="48.1" stroke-linecap="round"/>
   <circle cx="127.6" cy="672.3" r="55.1" fill="#ffffff" stroke="black" stroke-width="5.8"/>
