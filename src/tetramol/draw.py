@@ -62,6 +62,55 @@ def render(
     return geom.render_svg(geo, out=out, config=config)
 
 
+def render_png(
+    svg: str | Path | xyzrender.SVGResult,
+    out: str | Path | None = None,
+    *,
+    crop: Sequence[float] | None = None,
+    width: int = 1600,
+) -> bytes:
+    """Rasterize an SVG to a PNG, for a quick look, e.g. at arrows from `add_arrows`.
+
+    Args:
+        svg: The SVG, its text, or its path.
+        out: Output path. The suffix is replaced with ``.png``.
+        crop: Part of the drawing to show, as ``(x, y, width, height)`` in the SVG's
+            own units. Defaults to the whole drawing.
+        width: Width of the PNG, in pixels.
+
+    Returns:
+        The PNG.
+
+    Note:
+        This uses cairosvg, which doesn't draw ``context-stroke`` marker fills
+        (Inkscape's default arrowheads); they come out black.
+    """
+    import cairosvg  # noqa: PLC0415  (slow to import; only needed here)
+
+    text = Path(svg).read_text() if isinstance(svg, Path) else str(svg)
+    root = re.search(r"<svg\b[^>]*>", text)
+    if root is None:
+        msg = "Expected an <svg> element."
+        raise ValueError(msg)
+    tag = root.group(0)
+    if crop is None:
+        view_box = re.search(r'viewBox="([^"]*)"', tag)
+        crop = [float(x) for x in view_box.group(1).split()] if view_box else None
+    if crop is not None:
+        x, y, w, h = crop
+        tag = re.sub(r'\s(viewBox|width|height)="[^"]*"', "", tag)
+        height = round(width * h / w)
+        size = f' viewBox="{x} {y} {w} {h}" width="{width}" height="{height}"'
+        tag = tag[:4] + size + tag[4:]
+    png = cairosvg.svg2png(
+        bytestring=(text[: root.start()] + tag + text[root.end() :]).encode(),
+        background_color="white",
+    )
+    if out is not None:
+        Path(out).with_suffix(".png").write_bytes(png)
+    return png
+
+
 def render_spins(
     geo: Geometry,
     out: str | Path | None = None,

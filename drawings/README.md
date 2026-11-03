@@ -38,5 +38,8 @@ drawings/
   CREST runs in its own Pixi environment (`crest`), because it needs an older libgfortran than SciPy.
 - **Umbrella motions.** `b.umbrella_image(n)` adds the mirror image of the branch on atom `n` and keeps both sides; fade one in Inkscape.
   See `ethane-1,1,1-triamine/ideal.py`.
+- **Arrows.** To show how the molecule moves (torsions, umbrella inversions, overall rotation), add an `# %% Arrows` cell at the end that calls `add_arrows` on the rendered SVG.
+  It writes `<method>-arrows.svg`; `render_png` gives a quick look.
+  See `tham/ideal.py` and the "Motion arrows" user-guide page.
 - **Paths.** Scripts write next to themselves, using `__file__`.
   In a REPL, where `__file__` is undefined, they assume the REPL was started at the repository root.

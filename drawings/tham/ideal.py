@@ -6,7 +6,18 @@ from pathlib import Path
 from automol import geom
 from scipy.spatial.transform import Rotation
 
-from tetramol import Builder, orient, render, umbrella_edge_on, umbrella_image
+from tetramol import (
+    Builder,
+    ExternalRotation,
+    Umbrella,
+    add_arrows,
+    orient,
+    render,
+    render_png,
+    torsions,
+    umbrella_edge_on,
+    umbrella_image,
+)
 
 NAME = "tham"
 METHOD = "ideal"
@@ -38,3 +49,10 @@ geo.xyz_file(path=HERE / f"{METHOD}.xyz")
 render(geo, HERE / f"{METHOD}.svg")
 umbrella_geo, image = umbrella_image(geo, n)
 render(umbrella_geo, HERE / f"{METHOD}-umbrella.svg")
+
+# %% Arrows: a torsion on every rotor, the NH2 umbrella inversion (on the back H
+# pair), and overall rotation about the C-N axis; `render_png` is for a quick look
+arrows = [*torsions(umbrella_geo), Umbrella(n, image), ExternalRotation(c, n)]
+arrows_svg = add_arrows(HERE / f"{METHOD}-umbrella.svg", umbrella_geo, arrows)
+arrows_svg.save(HERE / f"{METHOD}-arrows.svg")
+render_png(arrows_svg)
